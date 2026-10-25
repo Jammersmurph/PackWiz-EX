@@ -969,6 +969,10 @@ file = "config/openpartiesandclaims-server.toml"
 hash = "1a1c63da454df2892901aafd7e38e1d47dafaa88017def469f09eba832a80c51"
 
 [[files]]
+file = "config/packupdater.properties"
+hash = "d05fbdf06fe78f8253de1c41f6dab9ad994bd593d2a6a4ecd7a28e0f489becf5"
+
+[[files]]
 file = "config/placebo.cfg"
 hash = "eb7e9906d126543f03c2257ca98efa4b845d1e7479dc8b069a12b194c86debcf"
 
@@ -2586,6 +2590,11 @@ metafile = true
 [[files]]
 file = "mods/owo-lib.pw.toml"
 hash = "3db5943419e6b6f4e33946266be8797230434573bc68dbe3a77d72f19001ae0c"
+metafile = true
+
+[[files]]
+file = "mods/packupdater.pw.toml"
+hash = "d0e200cf01ae162cab4edeffcbf43bf357080d7a87910230081dcf87a92a7392"
 metafile = true
 
 [[files]]
