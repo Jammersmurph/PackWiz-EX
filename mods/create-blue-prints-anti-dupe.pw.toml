@@ -1,0 +1,13 @@
+name = "Create Blue Prints Anti Dupe"
+filename = "create_blueprint_antidupe-1.0.0.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "054ef008cf6c02168fa44ce35c77a2e35130f605"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 7549292
+project-id = 1448851

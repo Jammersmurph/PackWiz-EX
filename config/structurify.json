@@ -1,0 +1,16 @@
+{
+  "config_version": "2.0.35",
+  "config_datetime": "2026-09-07_18-02-32",
+  "general": {},
+  "structure_namespaces": [],
+  "structures": [],
+  "structure_sets": [
+    {
+      "name": "underground_bunkers:minor_structures",
+      "structure_weights": {
+        "underground_bunkers:underground_bunker": 4
+      }
+    }
+  ],
+  "structure_template_pools": []
+}

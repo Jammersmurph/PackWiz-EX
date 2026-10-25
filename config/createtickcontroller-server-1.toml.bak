@@ -1,0 +1,265 @@
+#Emergency MSPT Protection
+#Acts as a safety net when MSPT gets too high.
+#Gradually increases divisor when struggling, decreases when recovering.
+#Effective divisor = max(manual global divisor, emergency divisor)
+[emergency]
+	#Enable emergency MSPT protection
+	enabled = true
+	#MSPT threshold to trigger emergency mode (milliseconds per tick)
+	#50ms = 20 TPS, 55ms ~ 18 TPS, 100ms = 10 TPS
+	# Default: 55.0
+	# Range: 20.0 ~ 500.0
+	msptThreshold = 55.0
+	#MSPT threshold to start recovery (decrease divisor)
+	#Should be lower than msptThreshold to avoid oscillation
+	# Default: 45.0
+	# Range: 10.0 ~ 500.0
+	recoveryMspt = 45.0
+	#How much to increase divisor each step when MSPT is too high
+	# Default: 2
+	# Range: 1 ~ 50
+	increment = 2
+	#How much to decrease divisor each step during recovery
+	# Default: 1
+	# Range: 1 ~ 50
+	decrement = 1
+	#How often to check MSPT and adjust (in ticks)
+	# Default: 10
+	# Range: 1 ~ 100
+	updateInterval = 10
+	#Maximum divisor the emergency system can reach
+	# Default: 100
+	# Range: 1 ~ 200
+	maxDivisor = 100
+
+#Blacklist Configuration
+#Block entities in this list will NEVER be throttled by the global divisor.
+#They can still have type-specific divisors set manually.
+#Use the simple class name (e.g., 'MillstoneBlockEntity')
+[blacklist]
+	#List of block entity types to exclude from global tick throttling.
+	#These will always tick at full speed unless a type-specific divisor is set.
+	types = ["PackagerBlockEntity", "StockTickerBlockEntity", "PackagerLinkBlockEntity", "RedstoneRequesterBlockEntity", "StationBlockEntity", "SignalBlockEntity", "TrackBlockEntity", "SequencedGearshiftBlockEntity", "PulseRepeaterBlockEntity", "PulseExtenderBlockEntity", "PulseTimerBlockEntity", "SmartObserverBlockEntity"]
+
+#Admin Web Dashboard
+#Embedded HTTP server providing a lag heatmap of all block entities,
+#per-type/per-block profiling and remote control of tick divisors.
+#SECURITY: keep bindAddress on 127.0.0.1 and access it via SSH tunnel or
+#reverse proxy. If you bind to 0.0.0.0, ALWAYS set a token.
+[web]
+	#Start the web dashboard when the server starts (can also be started with /tickcontrol web start)
+	enabled = false
+	#HTTP port for the dashboard
+	# Default: 8785
+	# Range: 1024 ~ 65535
+	port = 8785
+	#Bind address. 127.0.0.1 = local only (recommended), 0.0.0.0 = all interfaces
+	bindAddress = "127.0.0.1"
+	#Permanent admin token. When set, it grants full admin access to the
+	#dashboard. Time-limited access keys are generated in game with
+	#/lagmap (players, read-only) and /tickcontrol panel (admins).
+	token = ""
+	#Public base URL used in the clickable links given to players,
+	#e.g. 'http://play.myserver.com:8785'. Leave empty to derive it
+	#from bindAddress/the server IP (fine for LAN or local use).
+	publicUrl = ""
+
+#Compatibility with other mods
+[compat]
+	#Throttle Sophisticated Storage block entities (controller, link, I/O,
+	#input, output, and upgraded containers) with the global/per-type divisors.
+	#Only takes effect when Sophisticated Storage is installed.
+	sophisticatedStorage = true
+	#Exponential backoff for Sophisticated Storage hopper upgrades: an
+	#upgrade whose attempt moved nothing doubles its cooldown (capped
+	#below), and resets to normal speed on the first success or when a
+	#neighboring block changes. Working hoppers keep their exact speed;
+	#blocked ones stop grinding full-inventory scans every cycle.
+	hopperUpgradeBackoff = true
+	#Maximum backed-off cooldown, in ticks (600 = retry at most every 30s)
+	# Default: 600
+	# Range: 20 ~ 1200
+	hopperUpgradeBackoffMaxTicks = 600
+	#Fix Create Ornithopter Glider boosts freezing the server: the mod
+	#delays its boost with Thread.sleep(400) ON the server thread (8-tick
+	#freeze per boost). Replaces it with the same 400ms delay via a tick
+	#scheduler - identical gameplay, zero blocking.
+	ornithopterBoostFix = true
+	#Cache Create Diesel Generators' base oil amount per chunk: the
+	#pumpjack recomputes it (with per-block biome lookups) on every
+	#contraption tick although seed and biomes never change. Extraction
+	#amounts are unaffected (they use the mod's own mutable storage).
+	dieselOilCache = true
+	#Cache SimulatedCoasters' bearing/rivet plot scans. The mod
+	#re-scans every block of a sub-level's plot chunks on EVERY
+	#physics tick from its cart/rivet enforcement paths (~10% of
+	#the server thread on the 2026-08-23 production profile) even
+	#though plot contents rarely change. Results are cached per
+	#(plot, block type) for coasterScanCacheTicks; the mod's own
+	#invalidation events (cart spawn, membership changes) clear
+	#the cache instantly. Only takes effect when SimulatedCoasters
+	#is installed.
+	coasterScanCache = true
+	#Scan cache lifetime, in ticks (20 = a new bearing/rivet block is noticed within 1s)
+	# Default: 20
+	# Range: 2 ~ 1200
+	coasterScanCacheTicks = 20
+	#Neutralize Sable's WorldBorder handlers while the plot region
+	#sits entirely INSIDE the vanilla border (checked every tick,
+	#512-block margin; instantly restored if the border shrinks).
+	#The handlers exist to treat plots BEYOND the border as
+	#in-bounds; when plots are inside, they are pure overhead on
+	#the hottest paths of the game (per BE tick, chunk tick, spawn
+	#attempt, entity move - ~5.8% of the server thread on the
+	#2026-08-23 production profile). Only takes effect when Sable
+	#is installed.
+	sableBorderFastPath = true
+	#create_dupe_fix decides 'is a ship being (dis)assembled?' by
+	#capturing the full stack trace (Thread.getStackTrace) on every
+	#canSurvive / popResource call of the server - 3.2% of the
+	#server thread on the 2026-08-28 production profile. Same
+	#check, done with a lazy StackWalker that stops at the first
+	#matching frame. Only takes effect when create_dupe_fix is
+	#installed.
+	dupeFixFastStackWalk = true
+	#SimulatedCoasters broadcasts its ENTIRE coaster graph to every
+	#player on every Sable sub-level removal, and each client then
+	#re-aligns the whole graph. A ragdoll exit removes 6 sub-levels
+	#in one tick = 6 full syncs (9.6% of the render thread on the
+	#2026-08-30 client profile). Ragdoll sub-levels (which can never
+	#hold a coaster anchor) skip that observer; other removals use
+	#the mod's own per-tick coalescing instead of an immediate
+	#broadcast. Only takes effect when SimulatedCoasters is installed.
+	coasterSyncCoalesce = true
+	#Share Create's track curve runtime (handle length, curve length,
+	#segment table, bounds) between BezierConnection instances that
+	#describe the same curve. Create only caches it per instance;
+	#SimulatedCoasters re-creates every connection of its graph on
+	#each sync and rebuilds all of them. Keyed on the curve's
+	#endpoints, axes, material and coaster handle lengths, so an
+	#unchanged edge reuses its runtime. Server side of the same
+	#option in the client config.
+	bezierRuntimeCache = true
+	#Remove Sable Ragdolls limbs the ragdoll mod no longer tracks.
+	#Limbs are Sable sub-levels saved with the world, but the mod only
+	#tracks them in memory and never saves player ragdolls: after a
+	#restart or crash while someone was ragdolled the limbs stay
+	#forever (no death/logout/expiry ever reaches them). A ragdoll
+	#sub-level that is neither a player nor a mob part on two
+	#consecutive sweeps is removed. Only takes effect when Sable and
+	#sable_player_ragdoll are installed.
+	ragdollOrphanSweep = true
+	#Seconds between orphan sweeps; an orphan is removed after two sweeps.
+	# Default: 60
+	# Range: 10 ~ 3600
+	ragdollOrphanSweepSeconds = 60
+
+#Permission nodes registered through the NeoForge PermissionAPI,
+#usable in LuckPerms or any compatible permission mod:
+#  'createtickcontroller.lagmap' -> /lagmap (player read-only visualizer link).
+#                                   Default: everyone.
+#  'createtickcontroller.admin'  -> /tickcontrol, /tc and /tickcontrol panel
+#                                   (full admin panel). Default: OP (permission level 2).
+#Console and command blocks always fall back to vanilla permission levels.
+[permissions]
+	#Master switch for the /lagmap player command (overrides the permission node when false)
+	allowLagmap = true
+
+#Fluid throughput compensation
+#Throttled pumps/pipes make Create's fluid networks tick less often,
+#which would divide their throughput. With compensation enabled, each
+#network tick transfers proportionally more (transferSpeed x divisor,
+#capped below) - same mB/s with fewer, bigger transfers, so throttled
+#fluid logistics never slow down.
+#Automatically disabled when Create: LazyTick is installed (it scales
+#fluid transfers itself).
+[fluids]
+	#Enable fluid transfer compensation
+	compensation = true
+	#Maximum multiplier applied to transferSpeed. Protects tanks from
+	#other mods that cap how much they accept per fill operation.
+	# Default: 4
+	# Range: 1 ~ 16
+	compensationCap = 4
+
+#Kinetic network optimizations
+#Create recalculates a network's stress/capacity (a full sweep of all
+#members, plus a sync wave when the value changed) on EVERY member
+#add/remove/speed change - placing one block on a huge network can
+#trigger dozens of full sweeps in a single tick. Coalescing defers
+#them to exactly one recalculation per network per tick; worst case,
+#overstress is applied one tick late.
+[kinetics]
+	#Coalesce kinetic stress/capacity updates to once per network per tick
+	coalesceUpdates = true
+
+#Exponential backoff for logistics blocks that retry every tick
+#although nothing around them changed (full chest at the end of a
+#belt, jammed belt in front of a funnel, blocked vanilla hopper...).
+#Each failed attempt doubles the wait (2, 4, 8... ticks, capped
+#below); the first success or relevant change resets to full speed.
+#Working blocks are never slowed down - only ones stuck in a retry
+#loop. Caps bound the worst-case reaction time once unblocked.
+[backoff]
+	#Create funnels (extracting / pushing to belt): a funnel whose
+	#attempt moved nothing backs off using its own extraction cooldown.
+	funnels = true
+	#Maximum funnel backoff, in ticks (40 = retry at least every 2s)
+	# Default: 40
+	# Range: 8 ~ 600
+	funnelMaxTicks = 40
+	#Create belts: a belt whose items are all jammed (blocked by a full
+	#container or the item in front) skips its per-item transport scan.
+	#Item insertion, machine processing (press/deployer/fans) and speed
+	#changes wake the belt immediately; a freed container is noticed
+	#within the cap. Entities riding the belt are never affected.
+	belts = true
+	#Maximum belt backoff, in ticks (40 = rescan at least every 2s)
+	# Default: 40
+	# Range: 8 ~ 600
+	beltMaxTicks = 40
+	#Vanilla hoppers retry a full transfer scan EVERY tick when blocked
+	#(full destination, empty source). This backs failing hoppers off;
+	#hopper-to-hopper transfers still wake the receiver instantly.
+	#Keep the cap low: hoppers cannot detect container changes, so a
+	#backed-off hopper reacts up to the cap late (redstone-sensitive
+	#hopper contraptions may prefer this OFF).
+	vanillaHoppers = true
+	#Maximum vanilla hopper backoff, in ticks (20 = retry at least every 1s)
+	# Default: 20
+	# Range: 8 ~ 600
+	vanillaHopperMaxTicks = 20
+	#Create factory gauge panels: every panel polls the logistics
+	#network (stock summary, promises, link state) EVERY tick, even
+	#while satisfied, promise-covered, redstone-stopped or waiting on
+	#unloaded chunks. Idle panels back off; redstone edges and player
+	#edits wake them instantly, stock changes are seen within the cap.
+	#Panels counting down to a request are never slowed.
+	factoryPanels = true
+	#Maximum factory panel backoff, in ticks (40 = repoll at least every 2s)
+	# Default: 40
+	# Range: 8 ~ 600
+	factoryPanelMaxTicks = 40
+	#Create chutes: an empty chute whose pull from the inventory
+	#above extracted nothing backs off (2, 4, 8... ticks, capped).
+	#Create's version tracker already skips UNCHANGED inventories,
+	#but a busy storage (vault fed by a logistics network) changes
+	#every tick and forced a full extraction scan each time (2.1%
+	#of the server thread on the 2026-08-23 production profile).
+	#Any item handed to the chute wakes it instantly.
+	chutes = true
+	#Maximum chute backoff, in ticks (20 = retry at least every 1s)
+	# Default: 20
+	# Range: 8 ~ 600
+	chuteMaxTicks = 20
+	#Stop 'Fetching packet for removed entity ItemEntity[Air]' floods.
+	#An item entity that is already removed when the entity tracker
+	#first sees it (spawned with an empty stack, or discarded by an
+	#EntityJoinLevelEvent listener such as an item pickup/merging
+	#mod) makes the server log that warning for every player in
+	#range. A farm dropping dozens of stacks per tick turns this into
+	#a log flood that stalls the server thread and fills the disk.
+	#Such entities are simply never added to the world, and the
+	#responsible code is reported with a stack trace at most once
+	#per 30s so the culprit can be identified.
+	blockEmptyItemEntities = true

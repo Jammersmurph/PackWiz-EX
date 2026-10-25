@@ -1,0 +1,8 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"cbc_at:medium_ap_rocket_item"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_at:medium_hef_rocket_item"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_at:medium_he_rocket_item"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_at:medium_he_rocket_item","components":{"minecraft:lore":["{\"translate\":\"tooltip.createbigcannons.jei_info.added_fuze\"}"]}},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createpropulsion:platinum_fluid_tank"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

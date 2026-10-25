@@ -1,0 +1,14 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"cbcatfix:heat_shell","components":"{\"createbigcannons:fuze\":[{item:{components:{\"createbigcannons:fuze_timer\":71},count:1,id:\"createbigcannons:delayed_inertia_fuze\"},slot:0}],\"createbigcannons:tracer\":[{item:{count:1,id:\"createbigcannons:tracer_tip\"},slot:0}],\"minecraft:block_entity_data\":{Fuze:{components:{\"createbigcannons:fuze_timer\":71},count:1,id:\"createbigcannons:delayed_inertia_fuze\"},Tracer:{count:1,id:\"createbigcannons:tracer_tip\"},id:\"cbcatfix:fuzed_block_entity\"}}"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"minecraft:echo_shard"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"vista:cassette"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"vista:hollow_cassette"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:cruise_missile"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:detonator","components":"{\"minecraft:custom_data\":{BoundCharges:[[I;-29943,13,27640],[I;-29939,13,27637]]}}"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"tfmg:carbon_dioxide"},"type":"fluid_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"tfmg:fire_extinguisher"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"s_a_b:copmositearmor"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"s_a_b:hardsteelblock"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"s_a_b:nickelalloysteel"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

@@ -1,0 +1,15 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"cbcmodernwarfare:heap_shell"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:canister_autocannon_round"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:unbored_bronze_rotarycannon_breech"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:unbored_gun_launcher_chamber"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:incomplete_bronze_mediumcannon_breech"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:bronze_mediumcannon_breech"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:incomplete_bronze_rotarycannon_bearing"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:bronze_rotarycannon_bearing"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:solid_fuel_thruster"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:solid_fuel_tank"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbcmodernwarfare:infrared_seeker_guidance"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"create_dragons_plus:blaze_upgrade_smithing_template"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

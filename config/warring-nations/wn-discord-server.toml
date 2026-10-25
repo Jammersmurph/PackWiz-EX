@@ -1,0 +1,723 @@
+[connection]
+	#Master switch. If false, the bridge stays a no-op and never connects.
+	enabled = false
+	#Bot token. PREFER the env var WN_DISCORD_BOT_TOKEN; if set it overrides this.
+	botToken = ""
+	#The Discord server (guild) id.
+	guildId = ""
+	#Role id whose members may run admin slash commands / console commands.
+	staffRoleId = ""
+	#The bot's Discord presence/activity text, refreshed every presenceIntervalSeconds. Placeholders: %online% %max% %activewars% %nationcount% %currentwar% (the belligerents of one currently active war, rotating to a different one each tick as real time passes -- "no active wars" when there are none). Prefix with WATCHING:/LISTENING:/COMPETING: (case-insensitive, e.g. "WATCHING:%activewars% active war(s)") to use that Discord activity type instead of the default Playing. Blank = no activity text shown. Only used as a fallback when presenceRotation (below) is empty.
+	presenceFormat = "%online% / %max% players"
+	#This Minecraft server's own short name ("survival", "creative", "s1"), only
+	#needed when several Minecraft servers' wn-discord instances share ONE Discord guild
+	#(see docs/MULTI_SERVER_DESIGN.md). Blank (default) is correct for a normal single-server
+	#setup. Available as the %server% placeholder in role/channel-name templates below; this
+	#key alone changes nothing until a template is edited to actually use %server%.
+	serverId = ""
+	#Optional list of presence texts to rotate through round-robin, one per presenceIntervalSeconds tick, instead of always showing presenceFormat -- a genuinely "live" bot status instead of one static line, and a chance to reflect a real server state (e.g. ["WATCHING:%activewars% active war(s)", "WATCHING:%currentwar%", "%online% / %max% players", "%nationcount% nations"]). Same placeholders and WATCHING:/LISTENING:/COMPETING: prefix support as presenceFormat. Empty (the default) means presenceFormat alone is shown, unchanged from before this existed.
+	presenceRotation = []
+	#How often (seconds) the presence text above is re-rendered and pushed to Discord. Lower feels more "live"; there's little reason to go below a few seconds since %online%/%max% only actually changes on join/leave.
+	# Default: 60
+	# Range: 5 ~ 3600
+	presenceIntervalSeconds = 60
+	#Maps a WN Discord premium-feature key to the real Discord SKU id that gates it, as "featureKey=skuId" entries -- infrastructure for optional premium features (see dev.tacyeet.wndiscord.premium.Entitlements), kept ready and NOT wired to any core feature: nothing in this addon currently checks this, and none of it does anything until both a SKU exists in your Discord app's Developer Portal AND some future feature is deliberately gated on it via Entitlements#isEntitled. Empty by default.
+	premiumSkus = []
+
+[channels]
+	#Channel id for two-way player chat.
+	chat = ""
+	#Channel id for the console mirror.
+	console = ""
+	#Channel id for join/leave/death/advancement/start-stop.
+	events = ""
+	#Extra channels for addon feeds, as "key=channelId" (e.g. "nation=123456789").
+	extra = []
+
+[textCommands]
+	#Chat-message alternative to slash commands, e.g. "!wn nation list" or the bare "!whitelist add Steve". Every registered command works both ways.
+	enabled = true
+	#Prefix a message must start with to be tried as a command. Works namespaced ("<prefix>wn <command> [args]") or bare ("<prefix><command> [args]").
+	prefix = "!"
+	#Channel ids where "!" text commands are never dispatched (message falls through to chat relay instead). Manage with /setup ignore-add / ignore-remove / ignore-list.
+	ignoredChannels = []
+	#If non-empty, "!" text commands work ONLY in these channels; elsewhere a recognised command gets redirected here instead of running. Manage with /setup restrict-add / restrict-remove / restrict-list.
+	restrictedChannels = []
+
+[relay]
+	#Relay in-game chat to Discord.
+	mcToDiscord = true
+	#Relay Discord chat into the game.
+	discordToMc = true
+	#Use channel webhooks so relayed chat shows the player's name + avatar.
+	useWebhooks = true
+	#Mirror the server console/log into the console channel.
+	consoleEnabled = false
+	#Allow running server commands from the console channel (staff only).
+	consoleAllowCommands = false
+	#Optional prefix a console-channel message must start with to run as a command (empty = any line). Only matters when consoleAllowCommands above is true, and only a Discord server admin's messages are ever run as commands.
+	consoleCommandPrefix = ""
+	#Discord->MC only: collapse consecutive identical messages into a "(+N)" counter line instead of relaying the full text again each time.
+	duplicateCollapseEnabled = true
+	#How long (seconds) a repeat must follow the previous identical message within to be collapsed; older repeats relay in full again.
+	# Default: 45
+	# Range: 1 ~ 3600
+	duplicateCollapseWindowSeconds = 45
+	#How often (seconds) queued console/log lines are grouped into a fenced code-block message and sent to the console channel. Lower = closer to real-time but more, smaller Discord messages; higher = fewer, chunkier messages with more delay. Only applies to a fresh server start (or console-relay restart); changing this live has no effect until then.
+	# Default: 2
+	# Range: 1 ~ 30
+	consoleFlushIntervalSeconds = 2
+
+[filter]
+	#Basic content filtering for the two-way chat relay (both directions). Deliberately scoped down: a short severe-slur blocklist, Discord invite-link stripping (anti-advertising), mass-mention neutralisation, and simple per-user flood control. NOT a full moderation/strike/mute/ban system.
+	#Block relayed messages that contain a word from slurBlocklist below.
+	slurFilterEnabled = true
+	#Case-insensitive slur blocklist (also catches common leetspeak/spacing evasion, e.g. "n-i-g-g-3r"). This is the one place to tune it: edit freely, no rebuild required. Keep it to the most severe slurs only; this is deliberately not a general profanity filter.
+	slurBlocklist = ["nigger", "nigga", "faggot"]
+	#Block relayed messages containing a discord.gg/... or discord.com/invite/... invite link (anti-advertising).
+	inviteLinkFilterEnabled = true
+	#Neutralise @everyone/@here in relayed content so it can never mass-ping.
+	massMentionFilterEnabled = true
+	#Per-user flood control: once a user exceeds rateLimitMaxMessages within rateLimitWindowSeconds, further messages in that window are silently dropped from the relay (not an escalating punishment, just a short window).
+	rateLimitEnabled = true
+	#Max messages allowed per user within the window before extras are dropped.
+	# Default: 5
+	# Range: 1 ~ 1000
+	rateLimitMaxMessages = 5
+	#Sliding window size, in seconds, for the flood check.
+	# Default: 10
+	# Range: 1 ~ 3600
+	rateLimitWindowSeconds = 10
+
+[announcements]
+	#Announce player joins.
+	join = true
+	#Announce player leaves.
+	leave = true
+	#Announce player deaths.
+	death = true
+	#Announce advancements.
+	advancement = true
+	#Announce server start/stop.
+	serverStartStop = true
+	#At most this many event announcements (join/leave/death/advancement/server start-stop) sent to Discord per eventAnnounceWindowSeconds. A burst beyond this (e.g. a mass-login after a restart) is paced out over following ticks instead of firing all at once and risking Discord's own per-channel rate limit.
+	# Default: 5
+	# Range: 1 ~ 1000
+	eventAnnounceMaxPerWindow = 5
+	#Sliding window size, in seconds, for eventAnnounceMaxPerWindow.
+	# Default: 5
+	# Range: 1 ~ 3600
+	eventAnnounceWindowSeconds = 5
+
+[templates]
+	#Message templates. Supported placeholders include %player% %message% %user% %advancement% and any registered by addons.
+	mcChatToDiscord = "%player% » %message%"
+	#Discord -> Minecraft chat line. Wrap any part in &#RRGGBB ... &r to color it, e.g. the default below colors just the word Discord blue (#3B82F6).
+	discordChatToMc = "[Discord] %user%: %message%"
+	join = ":inbox_tray: **%player%** joined the game"
+	leave = ":outbox_tray: **%player%** left the game"
+	death = ":skull: %message%"
+	advancement = ":trophy: **%player%** earned the advancement **%advancement%**"
+	serverStart = ":white_check_mark: Server started"
+	serverStop = ":octagonal_sign: Server stopped"
+	#Optional embed form for join/leave/death/advancement/serverStart/serverStop. Off by default (the plain-text templates above are used unchanged). color is a hex string (with or without '#') or a %placeholder%; empty = no color (client default). Each *EmbedFields list holds extra "Name|Value|inline" rows (inline is true/false, e.g. "Killer|%player%|false"); leaving it empty just means no extra fields, the embed still works.
+	joinAsEmbed = false
+	joinEmbedTitle = ""
+	joinEmbedDescription = ":inbox_tray: **%player%** joined the game"
+	joinEmbedColor = ""
+	joinEmbedFooter = ""
+	joinEmbedFields = []
+	leaveAsEmbed = false
+	leaveEmbedTitle = ""
+	leaveEmbedDescription = ":outbox_tray: **%player%** left the game"
+	leaveEmbedColor = ""
+	leaveEmbedFooter = ""
+	leaveEmbedFields = []
+	deathAsEmbed = false
+	deathEmbedTitle = ""
+	deathEmbedDescription = ":skull: %message%"
+	deathEmbedColor = ""
+	deathEmbedFooter = ""
+	deathEmbedFields = []
+	advancementAsEmbed = false
+	advancementEmbedTitle = ""
+	advancementEmbedDescription = ":trophy: **%player%** earned the advancement **%advancement%**"
+	advancementEmbedColor = ""
+	advancementEmbedFooter = ""
+	advancementEmbedFields = []
+	serverStartAsEmbed = false
+	serverStartEmbedTitle = ""
+	serverStartEmbedDescription = ":white_check_mark: Server started"
+	serverStartEmbedColor = ""
+	serverStartEmbedFooter = ""
+	serverStartEmbedFields = []
+	serverStopAsEmbed = false
+	serverStopEmbedTitle = ""
+	serverStopEmbedDescription = ":octagonal_sign: Server stopped"
+	serverStopEmbedColor = ""
+	serverStopEmbedFooter = ""
+	serverStopEmbedFields = []
+
+[linking]
+	#Enable Discord OAuth2 account linking (/discord link).
+	enabled = false
+	#OAuth2 application client id.
+	clientId = ""
+	#OAuth2 client secret. PREFER env var WN_DISCORD_CLIENT_SECRET.
+	clientSecret = ""
+	#Registered redirect URI. Must exactly match the Discord app + point at this server's callback.
+	redirectUri = "http://localhost:9955/callback"
+	#Interface the embedded OAuth callback server listens on. "0.0.0.0" (default) accepts connections on every network interface so Discord's redirect can reach it -- narrow this only if you're proxying/firewalling the callback port yourself.
+	callbackBindHost = "0.0.0.0"
+	#Port the embedded OAuth callback server listens on.
+	# Default: 9955
+	# Range: 1 ~ 65535
+	callbackPort = 9955
+	#Require a linked Discord account to play (kick unlinked players with a link URL).
+	requireLinkedToPlay = false
+	#Minutes a "/discord link" browser link stays valid before it expires and the player must run /discord link again. Shorter = tighter security window on a URL that could leak; longer = more forgiving of a distracted player. Only takes effect on the next server start.
+	# Default: 10
+	# Range: 1 ~ 1440
+	codeExpiryMinutes = 10
+	#The embedded OAuth callback server is reachable from the open internet (anyone with the URL). At most this many requests are allowed per source address within callbackRateLimitWindowSeconds before extras get a "too many requests" page. Raise only if real players behind a shared/NAT'd IP (school, office, VPN) are getting rate-limited linking in a burst.
+	# Default: 10
+	# Range: 1 ~ 1000
+	callbackRateLimitMaxRequests = 10
+	#Sliding window size, in seconds, for callbackRateLimitMaxRequests.
+	# Default: 10
+	# Range: 1 ~ 3600
+	callbackRateLimitWindowSeconds = 10
+
+[roleSync]
+	#Enable Discord role <-> in-game group sync (requires linked accounts).
+	enabled = false
+	#Role id granted to linked server operators.
+	opRoleId = ""
+	#Role id granted to any linked player.
+	linkedRoleId = ""
+	#Auto-create/assign a Discord role per Warring Nations nation (= FTB party team).
+	nationRolesAuto = false
+	#How often (seconds) the periodic role-sync pass re-scans online players against their op/linked/nation roles. Lower = roles catch up to in-game changes (e.g. an op demotion) faster, at the cost of more Discord REST calls; raise it on a busy server with many nations. /resync always runs immediately regardless of this.
+	# Default: 60
+	# Range: 5 ~ 3600
+	intervalSeconds = 60
+
+[warringNations]
+	#Publish Warring Nations nation/war/diplomacy feeds to Discord.
+	feedsEnabled = true
+	#Bridge per-nation in-game chat (/nation msg) to a per-nation Discord channel. Default off: an active nation's in-game chat can be a lot of Discord traffic, and this is a one-way mirror (in-game -> Discord only; Discord replies are not relayed back).
+	nationChatBridge = false
+	#Auto-create a private Discord channel per nation (visible only to a same-named nation role) on founding, archived on disband. Requires the bot to have Manage Channels + Manage Roles. A nation renamed in-game will also rename its Discord channel/role.
+	perNationChannelsEnabled = false
+	#Optional category id new nation channels are created under. Empty = no category.
+	nationChannelCategoryId = ""
+	#On NationDisbanded, lock (deny sending) and rename the nation's channel to "archived-..." instead of deleting it, preserving history. If false, the channel is left untouched.
+	archiveNationChannelsOnDisband = true
+	#Discord hard-caps every server at 500 channels total (text + voice + category + forum + stage combined) -- not something a bot can raise. Once fewer than this many slots remain, a one-time warning is logged so you have advance notice before new per-nation channels start silently failing to create. Only matters if perNationChannelsEnabled is on; switching to warringNations.nationServers.enabled (each nation gets its own separate server instead) sidesteps this cap entirely.
+	# Default: 20
+	# Range: 1 ~ 499
+	channelCapWarnThreshold = 20
+	#Minimum seconds between edits to a war's live score embed as chunks are captured. Lower = the scoreboard updates closer to real-time; higher = fewer Discord API calls, useful with many simultaneous wars. Nothing is lost between edits, the embed always jumps to the latest score on the next allowed update.
+	# Default: 30
+	# Range: 1 ~ 300
+	warScoreboardEditIntervalSeconds = 30
+	#Spin up a public Discord thread off each war's live scoreboard message when it's declared, for that war's own ongoing discussion instead of it blending into the shared war feed channel.
+	warThreadsEnabled = true
+
+	[warringNations.nationServers]
+		#A nation-owned Discord server alternative to the private in-hub channel above. Server-owner-wide switch: takes precedence over warringNations.perNationChannelsEnabled when both are set. A nation leader/co-leader runs /discord nationserver link in game to get an invite link + one-time code; typing "!verify <code>" in the new server (as a Discord admin there) binds it. See core.jda.NationGuildManager.
+		enabled = false
+		#Auto-synced role names created in each linked nation server.
+		linkedRoleName = "Linked"
+		opRoleName = "Operator"
+		citizenRoleName = "Citizen"
+		#The bot's own nickname in each linked nation server, so it visibly reads as that nation's own bot instead of a generic guest -- set on link and kept in sync on in-game rename. Placeholder: %nation%. Blank = leave the bot's nickname alone.
+		botNicknameTemplate = "WN | %nation%"
+		#Append " [<rank>]" (their real in-game nation rank -- "Leader", or their assigned custom role's name, see WarringNationsAPI#nationRoleNameOf) to a linked member's OWN nickname in their nation's linked server, kept in sync on every role-sync pass. Off by default: unlike the bot's own nickname above, this edits a real person's display name, which needs Manage Nicknames and is a more visible thing to opt into deliberately.
+		syncMemberRankNicknames = false
+		#In-game /discord nationserver reply templates.
+		notEnabledMessage = "Per-nation Discord servers are not enabled on this server."
+		notLeaderMessage = "Only your nation's leader or a co-leader can link a Discord server."
+		alreadyLinkedMessage = "Your nation already has a linked Discord server. Run /discord nationserver unlink first."
+		linkPromptMessage = "Invite the bot to your nation's Discord server with the link below, then type this code in any channel it can see (expires in 10 minutes):"
+		inviteLabel = "» Click here to invite the bot «"
+		#Placeholders: %code%.
+		codeMessage = "!verify %code%"
+		notLinkedMessage = "Your nation has no linked Discord server. Run /discord nationserver link to set one up."
+		linkedStatusMessage = "Your nation's Discord server is linked and active."
+		unlinkedMessage = "Your nation's Discord server has been unlinked."
+		#Minutes a "!verify <code>" code stays valid before a nation leader must mint a fresh one with /discord nationserver link. Same tradeoff as linking.codeExpiryMinutes: shorter is a tighter security window, longer is more forgiving of a leader who gets pulled away mid-setup.
+		# Default: 10
+		# Range: 1 ~ 1440
+		verifyCodeExpiryMinutes = 10
+		#Length of the random "!verify" code minted for linking a nation's own Discord server. The alphabet skips visually-ambiguous characters (0/O, 1/I/L), so even the default 8 is already hard to guess or mistype; shorten only for convenience on a small/trusted server.
+		# Default: 8
+		# Range: 4 ~ 16
+		verifyCodeLength = 8
+		#How often (seconds) each linked nation server's own role sync and channel-default reconcile pass runs, independent of roleSync.intervalSeconds above (which only covers the hub server). Raise it if you have many nations each running their own server and want fewer REST calls.
+		# Default: 60
+		# Range: 5 ~ 3600
+		syncIntervalSeconds = 60
+
+		#Per-feed toggles for a linked nation server's own "deep feed", independent of the hub's own relay/warringNations toggles. All on by default.
+		[warringNations.nationServers.feeds]
+			chatBridge = true
+			lifecycle = true
+			war = true
+			claims = true
+			diplomacy = true
+			#Sync Linked/Operator/Citizen roles on each linked nation server. Off saves the per-nation REST traffic entirely if you only want the feeds/chat bridge.
+			roleSync = true
+
+			[warringNations.nationServers.feeds.govRoleSync]
+				#Government-framework role sync: an auto-created (or overridden, see gov-entity-overrides.json) Discord role per (government entity, membership role) a nation grants via /gov grant, e.g. a "Senate Finance Committee, chair" role. Off by default, unlike roleSync above: this is an OPEN-ENDED set of roles (as many as a nation's own government structure creates), not a fixed three-role ladder, so a server admin must consciously opt in rather than get an unbounded number of new roles for free.
+				enabled = false
+				#Ceiling on auto-created government roles PER LINKED SERVER (not counting Linked/Operator/Citizen or any premade role adopted via gov-entity-overrides.json), so a runaway nation (or a misbehaving procedure script granting memberships in a loop) can never exhaust a Discord server's own 250-role hard cap. 100 leaves comfortable headroom for the fixed roles plus whatever else the server already has.
+				# Default: 100
+				# Range: 1 ~ 200
+				maxRolesPerServer = 100
+
+[alerts]
+	#DiscordSRV-style scheduled announcements: rotates through "messages" on a timer, independent of any game event. Supports the same %placeholders% as other templates (without a player context, so %nation% etc. resolve empty).
+	#Enable scheduled announcements.
+	enabled = false
+	#Seconds between announcements.
+	# Default: 3600
+	# Range: 60 ~ 86400
+	intervalSeconds = 3600
+	#Logical channel key to post announcements to (e.g. "events", "chat", or an extra key).
+	channel = "events"
+	#Messages to rotate through, in order. Empty = feature is a no-op even if enabled.
+	messages = []
+
+[wnTemplates]
+	#Templates for every Warring Nations nation/war/diplomacy feed embed (see WnFeeds) plus nation role/channel naming. Every default below reproduces today's compiled-in wording and color exactly. color values are a hex string (with or without '#') or a %placeholder% that renders to one; empty defers to the event's own computed default (e.g. a nation's own color for nation-branded embeds). See the README's "Warring Nations feed placeholders" section for the exact %token% set each event exposes.
+	#Discord role name for a nation. Default reproduces today's raw nation name.
+	roleNameTemplate = "%nation%"
+	#Placeholders: %nation% %server% %role% (mentions the nation's role).
+	nationChannelWelcomeMessage = ":tada: **%nation%**'s nation channel is live."
+	nationChannelTopicTemplate = "Private channel for the nation of %nation%"
+	#Plain prefix (not a %placeholder% template) prepended to a nation channel's name on disband archival.
+	archivedChannelPrefix = "archived-"
+	#Placeholders: %nation% %founder%.
+	nationCreatedTitle = "🏛 Nation founded"
+	nationCreatedDescription = "**%nation%** was founded by **%founder%**"
+	nationCreatedColor = ""
+	#Placeholders: %nation%.
+	nationDisbandedTitle = "🏚 Nation disbanded"
+	nationDisbandedDescription = "**%nation%** has been disbanded"
+	nationDisbandedColor = "747F8D"
+	#Placeholders: %old_nation% %nation% (new name).
+	nationRenamedTitle = "✏ Nation renamed"
+	nationRenamedDescription = "**%old_nation%** is now known as **%nation%**"
+	nationRenamedColor = ""
+	#Placeholders: %player% %nation%.
+	memberJoinedTitle = "➕ Member joined"
+	memberJoinedDescription = "**%player%** joined **%nation%**"
+	memberJoinedColor = ""
+	#Placeholders: %player% %nation%.
+	memberLeftTitle = "➖ Member left"
+	memberLeftDescription = "**%player%** left **%nation%**"
+	memberLeftColor = ""
+	#Placeholders: %capturer% %chunk_x% %chunk_z% %dimension%.
+	chunkCaptureStartedTitle = "⚠ Territory under attack!"
+	chunkCaptureStartedDescription = "**%capturer%** is capturing your chunk at `%chunk_x%, %chunk_z%` in `%dimension%`, get there now!"
+	chunkCaptureStartedColor = "F04747"
+	#Placeholders: %capturer% %chunk_x% %chunk_z% %dimension%.
+	chunkCaptureInterruptedTitle = "🛡 Capture repelled"
+	chunkCaptureInterruptedDescription = "**%capturer%**'s capture attempt at `%chunk_x%, %chunk_z%` in `%dimension%` was interrupted"
+	chunkCaptureInterruptedColor = "43B581"
+	#Placeholders: %nation% %chunk_x% %chunk_z% %dimension%.
+	claimChangedTitle = "📍 Territory captured"
+	claimChangedDescription = "**%nation%** captured a chunk at `%chunk_x%, %chunk_z%` in `%dimension%`"
+	claimChangedColor = "FAA61A"
+	#Used instead of claimChangedTitle/Description/Color above when 2+ chunks
+	#change ownership for the same at-war nation in one batch (e.g. a large war-frontline
+	#push). Placeholders: %nation% %count%.
+	claimChangedBulkTitle = "📍 Territory captured"
+	claimChangedBulkDescription = "**%nation%** captured %count% chunks"
+	claimChangedBulkColor = "FAA61A"
+	#Placeholders: %founder% %nation%. Buttons/thumbnail stay hardcoded.
+	nationCreationPendingTitle = "🏛 Nation creation pending approval"
+	nationCreationPendingDescription = "**%founder%** wants to found **%nation%**"
+	nationCreationPendingColor = "FAA61A"
+	nationCreationPendingFooter = "Use the buttons below to approve or deny this request"
+	#Placeholders: %submitter% %nation%. Buttons/thumbnail stay hardcoded.
+	bannerPendingTitle = "🎨 Banner pending approval"
+	bannerPendingDescription = "**%submitter%** submitted a new banner for **%nation%**"
+	bannerPendingColor = ""
+	bannerPendingFooter = "Use the buttons below to approve or deny this banner"
+	#Placeholders: %attacker% %defender% %model% %model_full%. Buttons stay hardcoded.
+	warPendingApprovalTitle = "⏳ War pending approval"
+	warPendingApprovalDescription = "**%attacker%** declared war on **%defender%** (%model_full%)"
+	warPendingApprovalColor = "FF7043"
+	warPendingApprovalFooter = "Use the buttons below or /war approve in Discord"
+	#The 6 approve/deny confirmations below all take one placeholder: %staff%.
+	warApprovedTitle = "✅ War approved"
+	warApprovedDescription = "Approved by **%staff%**"
+	warApprovedColor = "43B581"
+	warDeniedTitle = "❌ War denied"
+	warDeniedDescription = "Denied by **%staff%**"
+	warDeniedColor = "F04747"
+	nationCreationApprovedTitle = "✅ Nation creation approved"
+	nationCreationApprovedDescription = "Approved by **%staff%**"
+	nationCreationApprovedColor = "43B581"
+	nationCreationDeniedTitle = "❌ Nation creation denied"
+	nationCreationDeniedDescription = "Denied by **%staff%**"
+	nationCreationDeniedColor = "F04747"
+	bannerApprovedTitle = "✅ Banner approved"
+	bannerApprovedDescription = "Approved by **%staff%**"
+	bannerApprovedColor = "43B581"
+	bannerDeniedTitle = "❌ Banner denied"
+	bannerDeniedDescription = "Denied by **%staff%**"
+	bannerDeniedColor = "F04747"
+	#Placeholders: %attacker% %defender% %model% %model_full%. The scroll GIF stays hardcoded.
+	warDeclaredTitle = "⚔ War Declared"
+	warDeclaredDescription = "**%attacker%** vs **%defender%**\r\n%model_full% war"
+	warDeclaredColor = "FF7043"
+	#The Discord scheduled-event text. Placeholders: %attacker% %defender% %model_full%.
+	warScheduledEventTitle = "War: %attacker% vs %defender%"
+	warScheduledEventDescription = "%model_full%, join the server to participate"
+	#The live war scoreboard, edited throughout the war. 4 structural phases (declared/active/ended/won) each with their own Title/Color; Description/ScoreFieldValue/Footer below are shared. Placeholders: %attacker% %defender% %model% %model_full%, plus %score_line% (Java-computed) and %winner% (won phase only).
+	warStatusDeclaredTitle = "⚔ %attacker% vs %defender%"
+	warStatusDeclaredColor = "FF7043"
+	warStatusActiveTitle = "⚔ %attacker% vs %defender%"
+	warStatusActiveColor = "F04747"
+	warStatusEndedTitle = "🕊 War ended"
+	warStatusEndedColor = "747F8D"
+	warStatusWonTitle = "🏆 %winner% won"
+	warStatusWonColor = "FAA61A"
+	warStatusDescription = "%model_full% war"
+	warStatusScoreFieldValue = "%score_line%"
+	#Static text, not auto-synced to warringNations.warScoreboardEditIntervalSeconds above -- if you change that interval, edit this string to match or it will misreport it.
+	warStatusFooter = "Updates every 30 s while the war is active"
+	#Placeholders: %for_nation% %vs_nation% %model% %model_full% %ready_count% %out_count%, plus %responses% (Java-computed: the formatted ready/out list).
+	rollcallTitle = "📯 Rollcall: %for_nation% vs %vs_nation%"
+	rollcallDescription = "**%model_full%** war, who's playing?"
+	rollcallColor = "F04747"
+	rollcallFieldName = "Responses (%ready_count% in, %out_count% out)"
+	rollcallFieldValue = "%responses%"
+	#Post-war breakdown embed. 2 structural variants (won/no-winner) each with their own Title/Color; Description/fields below are shared. Placeholders: %attacker% %defender% %model% %model_full% %winner% (won only) %attacker_score% %defender_score% %end_reason% %chunks_annexed%. The winner's banner thumbnail stays hardcoded.
+	warResolvedWonTitle = "🏆 %winner% won"
+	warResolvedWonColor = "FAA61A"
+	warResolvedNoWinnerTitle = "🕊 War ended"
+	warResolvedNoWinnerColor = "747F8D"
+	warResolvedDescription = "**%attacker%** vs **%defender%**, %model_full%"
+	warResolvedScoreFieldName = "Score"
+	warResolvedScoreFieldValue = "%attacker%: **%attacker_score%** | %defender%: **%defender_score%**"
+	warResolvedReasonFieldName = "Reason"
+	warResolvedReasonFieldValue = "%end_reason%"
+	warResolvedChunksFieldName = "Chunks annexed"
+	warResolvedChunksFieldValue = "%chunks_annexed%"
+	#The 3 relation-changed variants (ally/enemy/neutral) below each take %nation_a% %nation_b%.
+	relationAllyTitle = "🤝 Diplomacy"
+	relationAllyDescription = "**%nation_a%** and **%nation_b%** are now allied"
+	relationAllyColor = "43B581"
+	relationEnemyTitle = "🤝 Diplomacy"
+	relationEnemyDescription = "**%nation_a%** and **%nation_b%** are now enemies"
+	relationEnemyColor = "F04747"
+	relationNeutralTitle = "🤝 Diplomacy"
+	relationNeutralDescription = "**%nation_a%** and **%nation_b%** are now neutral"
+	relationNeutralColor = "5865F2"
+	#Nation channel NAME (not its topic, below). Rendered then slugged
+	#(lowercased, spaces to dashes, "nation-" prefixed) the same way the raw nation name always
+	#was. Default reproduces today's exact naming. Only useful to change for a multi-server
+	#shared-guild deployment (see docs/MULTI_SERVER_DESIGN.md), e.g. "%server%-%nation%", so two
+	#shards' same-named nations don't create identically-named channels.
+	nationChannelNameTemplate = "%nation%"
+	#Placeholders: %sender% %message%. Only used when
+	#warringNations.nationChatBridge is enabled.
+	nationChatMessageTitle = "💬 %sender%"
+	nationChatMessageDescription = "%message%"
+	nationChatMessageColor = ""
+	#Placeholders: %village% %founder% %nation%.
+	villageFoundedTitle = "🏘 Village founded"
+	villageFoundedDescription = "**%founder%** founded **%village%** under **%nation%**"
+	villageFoundedColor = ""
+	#Placeholders: %village%.
+	villageDisbandedTitle = "🏚 Village disbanded"
+	villageDisbandedDescription = "**%village%** has been disbanded"
+	villageDisbandedColor = "747F8D"
+	#Placeholders: %old_village% %village%.
+	villageRenamedTitle = "✏ Village renamed"
+	villageRenamedDescription = "**%old_village%** is now known as **%village%**"
+	villageRenamedColor = ""
+	#Placeholders: %village% %old_nation% %nation%.
+	villageAffiliationChangedTitle = "🔄 Village affiliation changed"
+	villageAffiliationChangedDescription = "**%village%** moved from **%old_nation%** to **%nation%**"
+	villageAffiliationChangedColor = ""
+	#Placeholders: %village% %attacker%.
+	villageSiegeStartedTitle = "⚔ Village under siege"
+	villageSiegeStartedDescription = "**%attacker%** has begun besieging **%village%**"
+	villageSiegeStartedColor = "F04747"
+	#Placeholders: %village% %attacker%.
+	villageSiegeLiftedTitle = "🛡 Village siege lifted"
+	villageSiegeLiftedDescription = "**%village%**'s siege by **%attacker%** has been lifted"
+	villageSiegeLiftedColor = "43B581"
+	#Fired only when applying a preset actually changed the nation (WnEvents.PresetApplied's own
+	#doc). Placeholders: %nation% %preset% %collection% %era% %changed_fields% (comma-joined).
+	presetAppliedTitle = "📜 Preset applied"
+	presetAppliedDescription = "**%nation%** applied the **%preset%** preset (%collection%, %era%). Changed: %changed_fields%."
+	presetAppliedColor = "FAA61A"
+	#Structured war-notification API (DiscordBridge#notifyWarStarted) used by
+	#third-party addons like wn-bluemap so they never compose Discord wording themselves.
+	#Placeholders: %attacker% %defender% %map_link% (blank when the caller passed none).
+	warStartedTitle = "⚔ War declared"
+	warStartedDescription = "**%attacker%** vs **%defender%**%map_link%"
+	warStartedColor = "FF7043"
+	#Structured war-notification API (DiscordBridge#notifyWarEnded).
+	#Placeholders: %attacker% %defender% %winner% (blank on a truce) %outcome%
+	#(Java-computed: "won by **<winner>**" or "ended in a truce") %map_link% (blank when
+	#the caller passed none).
+	warEndedTitle = "🏳 War ended"
+	warEndedDescription = "**%attacker%** vs **%defender%** %outcome%%map_link%"
+	warEndedColor = "747F8D"
+	#Structured siege-ring notification API (DiscordBridge#notifySiegeRingFallen)
+	#used by third-party addons (wn-siege, wn-bluemap) so they never compose Discord wording themselves.
+	#Placeholders: %attacker% %defender% %ring% (1-indexed) %map_link% (blank when the caller passed none).
+	siegeRingFallenTitle = "🧱 Ring breached"
+	siegeRingFallenDescription = "**%attacker%** breached ring %ring% of **%defender%**'s siege%map_link%"
+	siegeRingFallenColor = "F04747"
+	#Structured siege-ring notification API (DiscordBridge#notifySiegeRingRelieved).
+	#Placeholders: %attacker% %defender% %ring% (1-indexed) %map_link% (blank when the caller passed none).
+	siegeRingRelievedTitle = "🛡 Ring relieved"
+	siegeRingRelievedDescription = "**%defender%** relieved ring %ring%, pushing back **%attacker%**%map_link%"
+	siegeRingRelievedColor = "43B581"
+	#Structured siege-ring notification API (DiscordBridge#notifySiegeKeepHoldEntered), fired
+	#once per siege when the last wall ring falls. Placeholders: %attacker% %defender% %map_link%
+	#(blank when the caller passed none).
+	siegeKeepHoldTitle = "👑 Keep under siege"
+	siegeKeepHoldDescription = "Every ring has fallen -- **%attacker%** must now hold the keep against **%defender%**%map_link%"
+	siegeKeepHoldColor = "FAA61A"
+	#Structured village-conquest notification API (DiscordBridge#notifyVillageSiegeStarted)
+	#used by third-party addons (wn-bluemap) so they never compose Discord wording themselves.
+	#Placeholders: %village% %attacker% %map_link% (blank when the caller passed none).
+	villageSiegeStartedApiTitle = "⚔ Village under siege"
+	villageSiegeStartedApiDescription = "**%attacker%** has begun besieging **%village%**%map_link%"
+	villageSiegeStartedApiColor = "F04747"
+	#Structured village-conquest notification API (DiscordBridge#notifyVillageSiegeLifted).
+	#Placeholders: %village% %attacker% %map_link% (blank when the caller passed none).
+	villageSiegeLiftedApiTitle = "🛡 Village siege lifted"
+	villageSiegeLiftedApiDescription = "**%village%**'s siege by **%attacker%** has been lifted%map_link%"
+	villageSiegeLiftedApiColor = "43B581"
+	#Structured preset-application notification API (DiscordBridge#notifyPresetApplied)
+	#used by third-party addons (wn-bluemap) so they never compose Discord wording themselves.
+	#Placeholders: %nation% %preset% %collection% %era% %changed_fields% (comma-joined)
+	#%treasury_line% (Java-computed, blank when nothing was credited) %roles_line% (Java-computed,
+	#blank when no roles were created) %map_link% (blank when the caller passed none).
+	presetAppliedApiTitle = "📜 Preset applied"
+	presetAppliedApiDescription = "**%nation%** applied the **%preset%** preset (%collection%, %era%). Changed: %changed_fields%.%treasury_line%%roles_line%%map_link%"
+	presetAppliedApiColor = "FAA61A"
+	#Extra staff-facing fields on the pending-approval embed above.
+	#Discord: the founder's linked Discord mention, or a plain "Not linked" when they have none.
+	#Status: whether the founder is currently online. Other Pending Requests: how many OTHER
+	#nation-creation requests are also awaiting review right now (omitted entirely when there are none).
+	#Placeholders: %founder% %nation% %discord% %status% %other_pending%.
+	nationCreationPendingDiscordFieldName = "Discord"
+	nationCreationPendingDiscordFieldValue = "%discord%"
+	nationCreationPendingStatusFieldName = "Status"
+	nationCreationPendingStatusFieldValue = "%status%"
+	nationCreationPendingOtherPendingFieldName = "Other Pending Requests"
+	nationCreationPendingOtherPendingFieldValue = "%other_pending%"
+	#Post an aggregate war-bet settlement embed to the war channel whenever a war with active bets resolves. Never names individual bettors or their amounts (that's one player's own finances) -- only totals. Placeholders: %bettor_count% %total_pot% %total_paid_out% %winner% (won only).
+	betSettledEnabled = true
+	betSettledWonTitle = "💰 War bets settled: %winner% backers paid out"
+	betSettledWonColor = "FAA61A"
+	betSettledRefundTitle = "💰 War bets refunded (no decisive winner)"
+	betSettledRefundColor = "747F8D"
+	betSettledDescription = "%bettor_count% bettor(s), %total_pot% total wagered."
+	betSettledPotFieldName = "Paid out"
+	betSettledPotFieldValue = "%total_paid_out%"
+	#Government framework feed (WnGovFeeds) -- see the README's "Government framework" section for the full %gov_*% placeholder set each event exposes. Placeholders: %gov_kind% %gov_entity% %gov_proposer%.
+	govProposalOpenedTitle = "📜 Proposal opened"
+	govProposalOpenedDescription = "A **%gov_kind%** proposal was opened in **%gov_entity%** by **%gov_proposer%**"
+	govProposalOpenedColor = "5865F2"
+	#Placeholders: %gov_kind% %gov_entity% %gov_outcome%.
+	govProposalResolvedTitle = "🗳 Proposal resolved"
+	govProposalResolvedDescription = "The **%gov_kind%** proposal in **%gov_entity%** resolved: **%gov_outcome%**"
+	govProposalResolvedColor = "FAA61A"
+	#Color override when a proposal resolves via cancellation instead of a real outcome (title/description templates above are shared).
+	govProposalCancelledColor = "747F8D"
+	#Placeholders: %gov_subject% %gov_role% %gov_entity%.
+	govMembershipGrantedTitle = "🎖 Appointment"
+	govMembershipGrantedDescription = "**%gov_subject%** was appointed **%gov_role%** in **%gov_entity%**"
+	govMembershipGrantedColor = "43B581"
+	#Placeholders: %gov_subject% %gov_role% %gov_entity%.
+	govMembershipRevokedTitle = "🎖 Removal"
+	govMembershipRevokedDescription = "**%gov_subject%** was removed from **%gov_role%** in **%gov_entity%**"
+	govMembershipRevokedColor = "F04747"
+	#Minimum seconds between edits to a proposal's live vote-tally embed, same rate-limit reasoning as warScoreboardEditIntervalSeconds above.
+	# Default: 5
+	# Range: 1 ~ 300
+	govVoteTallyEditIntervalSeconds = 5
+	#VoteTallyPolicy id used for the live tally preview and the %gov_tally% placeholder, since neither the proposal API nor its events expose which policy id a proposal's own procedure actually resolves with -- see the README's known-gaps note. WN core ships "simple_majority" and "plurality" as built-ins.
+	govDefaultTallyPolicyId = "simple_majority"
+
+[commandTemplates]
+	#Titles/colors/static copy for the slash (and equivalent ! text) commands' reply embeds. Live list/table bodies (nation rosters, leaderboard rows, claim coordinates, help text) stay computed, not templated, same reasoning as [wnTemplates]'s rollcall response list. color values are a hex string (with or without '#') or a %placeholder%.
+	#/server online. Placeholders: %online% %max%.
+	onlineTitle = "Players online (%online%/%max%)"
+	onlineColor = "5865F2"
+	onlineEmptyDescription = "Nobody is online right now."
+	#/nations list. Placeholders: %count%.
+	nationsTitle = "Nations (%count%)"
+	nationsEmptyTitle = "Nations"
+	nationsEmptyDescription = "No nations exist yet."
+	nationsColor = "5865F2"
+	#/nation info. Placeholders: %nation%.
+	nationTitle = "🏛 %nation%"
+	nationColorAtWar = "F04747"
+	nationColorPeace = "43B581"
+	nationAtWarYes = "Yes ⚔"
+	nationAtWarNo = "No"
+	#/war list.
+	warsEmptyTitle = "🕊 No active wars"
+	warsTitle = "⚔ Nations at war"
+	warsEmptyDescription = "All is quiet."
+	warsEmptyColor = "43B581"
+	warsColor = "F04747"
+	#/account whois, /account whoami. Placeholders: %player%.
+	whoisTitle = "👤 %player%"
+	whoisColor = "5865F2"
+	#/nations roster. Placeholders: %nation% %count%.
+	rosterTitle = "👥 %nation% (%count% member(s))"
+	rosterEmptyDescription = "No members."
+	rosterColor = "5865F2"
+	#/nations chunk.
+	claimUnclaimedTitle = "📍 Unclaimed"
+	claimUnclaimedColor = "43B581"
+	#Placeholders: %nation%.
+	claimOwnedTitle = "📍 %nation%"
+	claimOwnedColor = "5865F2"
+	#/nations compare. Placeholders: %nation_a% %nation_b%.
+	compareTitle = "%nation_a% ↔ %nation_b%"
+	compareAtWarText = "⚔ At war"
+	compareAtWarColor = "F04747"
+	compareAlliedText = "🤝 Allied"
+	compareAlliedColor = "43B581"
+	compareNeutralText = "Neutral"
+	compareNeutralColor = "5865F2"
+	#/nations leaderboard. Placeholders: %metric% ("claims" or "members").
+	leaderboardTitle = "🏆 Leaderboard (by %metric%)"
+	leaderboardEmptyTitle = "Leaderboard"
+	leaderboardEmptyDescription = "No nations exist yet."
+	leaderboardColor = "FAA61A"
+	leaderboardEmptyColor = "5865F2"
+	#/staff claims (staff only). Placeholders: %nation% %count%.
+	claimsListTitle = "📍 %nation% (%count% claim(s))"
+	claimsListEmptyDescription = "No claims."
+	claimsListColor = "5865F2"
+	#/nations history. Placeholders: %nation%.
+	historyTitle = "📜 %nation%'s war history"
+	historyEmptyTitle = "📜 %nation%"
+	historyEmptyDescription = "No past wars."
+	historyColor = "5865F2"
+	#/server status.
+	serverStatusTitle = "🖥 Server status"
+	serverStatusColor = "5865F2"
+	#/whitelist <sub> (staff only). Placeholders: %count% where shown.
+	whitelistListTitle = "📋 Whitelist (%count%)"
+	whitelistEmptyDescription = "Empty."
+	whitelistListColor = "5865F2"
+	whitelistAddedTitle = "✅ Whitelisted"
+	whitelistAddedColor = "43B581"
+	whitelistRemovedTitle = "❌ Removed"
+	whitelistRemovedColor = "F04747"
+	whitelistOnTitle = "✅ Whitelist enabled"
+	whitelistOnColor = "43B581"
+	whitelistOffTitle = "❌ Whitelist disabled"
+	whitelistOffColor = "F04747"
+	whitelistReloadedTitle = "🔄 Whitelist reloaded"
+	whitelistReloadedColor = "5865F2"
+	#/war rally. Placeholders: %nation%.
+	rallyTitle = "📯 Rally: %nation%"
+	rallyDescription = "**%nation%** is calling for battle!"
+	rallyColor = "F04747"
+	#/help (no args) -- now a live Components V2 category view rather than an embed, so there's no separate title/footer text to template here, just its accent color.
+	helpColor = "5865F2"
+	#/help <command>. Placeholders: %command%.
+	commandHelpTitle = "📖 /%command%"
+	commandHelpColor = "5865F2"
+	#/debug (staff only); each subcommand appends its own name to this title.
+	debugTitle = "🩺 Diagnostics"
+	debugColor = "5865F2"
+	#The generic reply shape used by every subcommand that bridges straight to an in-game /wn command (nation invite/kick/rename/..., diplomacy, war declare/status/..., /staff stats): a green "done" embed when the command produced no output, else a blue embed of the raw in-game feedback lines.
+	bridgedDoneDescription = "Done."
+	bridgedDoneColor = "43B581"
+	bridgedColor = "5865F2"
+	#The shared error-embed wrapper every command's failure/validation messages use. Only the title/color are configurable; the message bodies themselves are short parameterized diagnostic text (e.g. "No nation named X found."), not brand copy.
+	errorTitle = ""
+	errorColor = "F04747"
+	#/nations villages. Placeholders: %nation% %count%. %nation% is "the server" when no nation was given.
+	villagesTitle = "🏘 Villages of %nation% (%count%)"
+	villagesEmptyDescription = "No villages."
+	villagesColor = "5865F2"
+	#/war stats. Placeholders: %player%.
+	warStatsTitle = "⚔ War stats: %player%"
+	warStatsEmptyDescription = "No recorded war activity."
+	warStatsColor = "5865F2"
+	#/nations graph. Placeholders: %nation%. %nation% is "leaderboard" when no nation was given.
+	graphTitle = "📈 Growth: %nation%"
+	graphColor = "FAA61A"
+
+[linkTemplates]
+	#Account-linking flow: in-game /discord chat messages, the requireLinkedToPlay kick messages, and the OAuth callback web pages (HTML/CSS shell fixed, only title/body text is templated). In-game messages support &#RRGGBB...&r color tokens layered on top of that message's default semantic color, same mechanism as [templates].discordChatToMc.
+	linkNotEnabledMessage = "Discord account linking is not enabled on this server."
+	linkAlreadyLinkedMessage = "Your account is already linked. Use /discord unlink first."
+	linkFailedMessage = "Could not start linking. Try again shortly."
+	linkPromptMessage = "Open this link in your browser (expires in a few minutes):"
+	linkButtonText = "» Click here to link your Discord account «"
+	unlinkNotAvailableMessage = "Discord linking is not available right now."
+	unlinkSuccessMessage = "Your Discord account has been unlinked."
+	unlinkNotLinkedMessage = "You do not have a linked Discord account."
+	statusNotEnabledMessage = "Discord linking is not enabled on this server."
+	#Placeholders: %id% (the linked Discord snowflake).
+	statusLinkedMessage = "Linked to Discord id %id%."
+	statusNotLinkedMessage = "Not linked. Run /discord link to connect your account."
+	reloadSuccessMessage = "WN Discord bridge reloaded from config."
+	#Placeholders: %error%.
+	reloadFailedMessage = "Reload failed: %error%"
+	#Kick message when requireLinkedToPlay is on and the joining player has no linked Discord account. Placeholders: %url% (the one-click authorize link).
+	requireLinkKickMessage = "Link your Discord account to play:\r\n%url%"
+	requireLinkUnavailableMessage = "This server requires a linked Discord account, but linking is unavailable. Contact staff."
+	oauthMethodNotAllowedTitle = "Method not allowed"
+	oauthMethodNotAllowedBody = "Use the link Discord sent you."
+	oauthCancelledTitle = "Link cancelled"
+	#Placeholders: %error% (Discord's own error code, HTML-escaped).
+	oauthCancelledBody = "Discord returned: %error%."
+	oauthInvalidRequestTitle = "Invalid request"
+	oauthInvalidRequestBody = "Missing code or state. Start again with /discord link in game."
+	oauthNotMemberTitle = "Not a server member"
+	oauthNotMemberBody = "You authorized Discord, but you're not a member of this server yet. Join the Discord server first, then run /discord link again in Minecraft."
+	oauthLinkedTitle = "Linked!"
+	#Placeholders: %name% (the linked Minecraft username, HTML-escaped).
+	oauthLinkedBody = "Your Discord account is now linked to <b>%name%</b>. You can close this tab and return to Minecraft."
+	oauthExpiredTitle = "Link expired"
+	oauthExpiredBody = "That link request expired or was already used. Run /discord link in game to get a fresh link."
+	oauthErrorTitle = "Something went wrong"
+	oauthErrorBody = "Could not complete the link. Please try again."
+
+[commandGates]
+	#Generic fallback replies shared by every slash command AND its equivalent ! text command (unknown command/subcommand, permission gates, unhandled exceptions).
+	unknownCommandMessage = "Unknown command."
+	unknownSubcommandMessage = "Unknown subcommand."
+	#The ! text-command form of unknownSubcommandMessage, richer since it can list the valid options. Placeholders: %subcommand% %options% %prefix% %command%.
+	unknownSubcommandTextMessage = "Unknown subcommand \"%subcommand%\". Options: %options%. Run \"%prefix%help %command%\" for details."
+	requireLinkMessage = "Link your Minecraft account first, then run **/discord link** in game."
+	adminOnlyMessage = "You don't have permission to use this command."
+	#Placeholders: %error% (the thrown exception's simple class name).
+	commandFailedMessage = "Command failed: %error%"
+
+[debug]
+	#Hard cap on how many recent crash logs one /debug crashlogs invocation may request at once (the count option is clamped to this), so a maintainer can't accidentally queue a huge batch of DMs.
+	# Default: 10
+	# Range: 1 ~ 50
+	crashLogMaxCount = 10
+	#Max size, in bytes, of a single crash-log file Discord will accept as a DM attachment (Discord's own default non-boosted-server limit is 8 MiB per file; this addon gzips an oversized log before falling back to splitting it into numbered parts). Default 8388608 (8 MiB).
+	# Default: 8388608
+	# Range: 65536 ~ 104857600
+	crashLogMaxAttachmentBytes = 8388608
+
+[metrics]
+	#Send anonymous server/player-count usage statistics to bStats (bstats.org), the standard analytics service most Minecraft mods use. Only aggregate counts are sent (player count, server count, OS/Java version) -- never player names, UUIDs, Discord ids, guild ids, IPs, or server addresses. This is an additional, mod-specific off switch; bStats also writes its own global opt-out file (config/bStats/config.yml) that applies to every mod on the server, independent of this setting. Default true (on by default, matching bStats' own convention), but you may want to turn this off if your server has a strict no-telemetry policy.
+	enabled = true

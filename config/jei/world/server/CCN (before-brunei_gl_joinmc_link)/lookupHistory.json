@@ -1,0 +1,7 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"easy_villagers:breeder"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"easy_villagers:converter"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"create_submarine:underwater_mine"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"easy_villagers:farmer"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

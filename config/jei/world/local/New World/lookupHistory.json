@@ -1,0 +1,17 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"createbb:liquid_methamphetamine"},"type":"fluid_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbb:white_meth_tray"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbb:white_meth"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbb:trapped_brass_call_bell"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbb:pseudophedrine"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbb:sudafed_box"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbb:sudafed"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:sea_bomb"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:large_bomb"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:medium_bomb"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:small_bomb"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:small_bomb_2"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:large_mine"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_more_content:small_bomb_3"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

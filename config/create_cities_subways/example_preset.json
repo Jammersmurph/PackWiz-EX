@@ -1,0 +1,12 @@
+{
+    "profile": "default",
+    "description": "Default Lost Cities profile - cities are generated normally",
+    "settings": {
+        "cityChance": 0.02,
+        "cityMinRadius": 128,
+        "cityMaxRadius": 128,
+        "generateLighting": true,
+        "generateSpawners": false,
+        "ruinChance": 0.1
+    }
+}

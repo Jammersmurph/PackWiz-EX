@@ -1,0 +1,10 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"drivebywire:controller_hub"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createpropulsion:ion_thruster"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"create:pulse_extender"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_ballistics:cannon_control"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_ballistics:ballistic_calculator"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_ballistics:artillery_coordinator"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"cbc_ballistics:radio_item"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

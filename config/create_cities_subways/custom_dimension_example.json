@@ -1,0 +1,13 @@
+{
+    "profile": "tallbuildings",
+    "description": "Example configuration for custom dimensions - requires manual dimension config",
+    "settings": {
+        "cityChance": 0.1,
+        "cityMinRadius": 200,
+        "cityMaxRadius": 200,
+        "generateLighting": true,
+        "generateSpawners": true,
+        "ruinChance": 0.05,
+        "vineChance": 0.2
+    }
+}

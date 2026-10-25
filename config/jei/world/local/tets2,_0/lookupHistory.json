@@ -1,0 +1,7 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"rocketnautics:titanium_ingot"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"rocketnautics:titanium_nozzle"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"rocketnautics:copper_nozzle"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"rocketnautics:copper_leg_thrusters"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

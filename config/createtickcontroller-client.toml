@@ -1,0 +1,228 @@
+#Client-side FPS relief for large Create bases
+#Every Create block entity also ticks on the CLIENT each game tick
+#(animation lerps, belt item simulation, effects). In a big base the
+#client 'tick' section of the F3 profiler can starve the renderer.
+#Distance-based reduction ticks far-away Create block entities less
+#often: full rate up close (rotation visuals are render-time based
+#and stay perfectly smooth), reduced rate at distance where the
+#difference is invisible. Purely visual and local to this client -
+#server logic and item transport are never affected.
+[clientTicks]
+	#Enable distance-based client tick reduction for Create block entities
+	distanceTickReduction = true
+	#Up to this distance (blocks from camera), block entities tick at
+	#full rate - everything you can see up close stays flawless.
+	#Keep >= 32 so Create's ambient machine sounds are unaffected.
+	# Default: 32
+	# Range: 4 ~ 128
+	fullRateDistance = 32
+	#Between fullRateDistance and this, block entities tick every 2nd
+	#tick; beyond it, every farDivisor-th tick.
+	# Default: 64
+	# Range: 16 ~ 256
+	reducedRateDistance = 64
+	#Tick divisor in the middle band (fullRateDistance to
+	#reducedRateDistance). 2 = every 2nd tick (historical behavior).
+	#1 disables reduction in this band; raise to 4 on weak machines -
+	#this band is the machines you actually look at, so higher values
+	#are visible up close.
+	# Default: 2
+	# Range: 1 ~ 16
+	midDivisor = 2
+	#Tick divisor beyond reducedRateDistance (4 = 5 ticks/second).
+	#1 = vanilla (no reduction in the far band).
+	# Default: 4
+	# Range: 1 ~ 64
+	farDivisor = 4
+	#Maximum distance (blocks) at which Create block entities are
+	#RENDERED. 64 = vanilla radius (no culling). Lower values skip the
+	#dynamic renderer of distant machines - a major FPS win in bases
+	#where block entity rendering dominates the frame. With Flywheel's
+	#backend enabled the machine bodies stay visible (instanced) and
+	#only far dynamic details (belt items, dials) disappear; with
+	#/flywheel backend off, whole machines vanish beyond this radius.
+	# Default: 64
+	# Range: 8 ~ 64
+	beRenderDistance = 64
+	#Same render-distance culling for ALL OTHER block entities
+	#(vanilla chests, signs, other mods' containers...). 64 = vanilla
+	#(no culling). WARNING: unlike Create machines (whose bodies stay
+	#visible through Flywheel), these are entirely renderer-drawn -
+	#beyond this radius chests, signs and banners visibly disappear.
+	#24-32 is a reasonable aggressive value.
+	# Default: 64
+	# Range: 16 ~ 64
+	otherBeRenderDistance = 64
+	#Skip rendering Create block entities whose entire render
+	#bounding box is behind the camera. Sodium already culls whole
+	#16x16x16 sections, but standing inside a machine hall the
+	#neighboring sections stay 'visible' while half their machines are
+	#behind you. Correct for long machines (belts) because the full
+	#render box is tested, and automatically disabled during Iris
+	#shadow passes so shader shadows stay intact.
+	behindCameraCulling = true
+	#Drop positional sound packets that are too far to hear. Vanilla
+	#creates an audio channel (BLOCKING the render thread on a
+	#CompletableFuture) for EVERY sound received, even ones far
+	#beyond audible range - and servers broadcast sounds to 64 blocks
+	#while most are audible at 16. Lossless at the default distance.
+	soundDistanceCulling = true
+	#Also apply the distance and spam filters to CLIENT-started
+	#positional sounds (SoundManager.play), not just server packets.
+	#Mods like Create Diesel Generators start engine/pumpjack sounds
+	#from tickClient every few ticks; each start blocks the render
+	#thread on its audio channel (~9% of the frame on the reference
+	#profile). Looping sounds and UI/music are never touched.
+	soundLocalCulling = true
+	#Culling radius in blocks per volume unit: a sound is dropped
+	#beyond soundCullDistance x max(1, volume). Default 48 = 3x the
+	#standard 16-block audible radius, so even extended-range sounds
+	#survive. Lower toward 24 for more FPS in loud factories.
+	# Default: 48
+	# Range: 16 ~ 256
+	soundCullDistance = 48
+	#Maximum starts of the SAME sound event per client tick (0 = off).
+	#20 identical clanks started in one tick are indistinguishable
+	#from 6, but each one blocks the render thread for its channel.
+	# Default: 6
+	# Range: 0 ~ 64
+	soundSpamCap = 6
+	#Hard cap on TOTAL server-sent sound starts per client tick
+	#(0 = off). Each start blocks the render thread for its audio
+	#channel; in a factory din, sounds beyond ~16/tick are
+	#indistinguishable. Bounds the worst case whatever the source.
+	# Default: 16
+	# Range: 0 ~ 128
+	soundMaxPerTick = 16
+	#Maximum starts of the SAME sound event per SECOND (0 = off).
+	#The per-tick cap does not bound the rate of a sound restarted
+	#every few ticks - a dozen nearby diesel engines each restarting
+	#their loop stays under 6/tick yet reaches 12+/second, and every
+	#start blocks the render thread on the audio channel. 10
+	#overlapping copies of the same sound per second are already
+	#indistinguishable from more.
+	# Default: 10
+	# Range: 0 ~ 256
+	soundSpamCapPerSecond = 10
+	#TIME budget (milliseconds per tick, amortized) for starting
+	#sounds (0 = off). Every sound start blocks the render thread
+	#while the audio thread creates its channel - with audio-heavy
+	#mods like Sound Physics Remastered a single start can cost
+	#4-5 ms. Leaky bucket: time spent above the budget carries over
+	#as debt into following ticks, so the AVERAGE render-thread cost
+	#of sound starts never exceeds this value even when one start
+	#blows past it. UI, music and looping sounds are never dropped.
+	#Lower toward 1.0 for more FPS in loud factories.
+	# Default: 2.0
+	# Range: 0.0 ~ 50.0
+	soundBudgetMs = 2.0
+	#Block entity classes NEVER affected by the client tick reduction
+	#or render culling. Match by full class name prefix (a package
+	#excludes a whole mod) or exact simple class name. Use for
+	#dynamic visuals that must stay exact at any distance/angle -
+	#e.g. suspension wheels and caterpillar tracks on vehicles.
+	#Tracks+ (dev.qwxon.tracks), Offroad vehicle wheels
+	#(dev.ryanhcode.offroad: rock cutting wheels, wheel mounts,
+	#borehead bearings), Create Propulsion thrusters and Create:
+	#Simulated torsion springs (wing animations on Sable
+	#structures) are always excluded, in addition to this list.
+	cullingExclusions = ["dev.qwxon.tracks"]
+	#Positional sounds within this distance of the player are
+	#NEVER dropped by the spam caps or the time budget (distance
+	#culling obviously passes them too). What happens next to
+	#your ears is gameplay - your own gunshots, block placing,
+	#a mob at melee range - and must not compete with machine
+	#din for the caps. 0 disables the protection. Note the caps
+	#and budget also only apply to BLOCKS-category sounds
+	#(machines); player/mob/weather sounds always pass.
+	# Default: 8
+	# Range: 0 ~ 32
+	soundProtectDistance = 8
+	#Aboard Sable ships (sub-levels), apply the normal distance
+	#tick bands to block entities using their TRUE visual distance
+	#(projected out of the plot chunks via Sable's API). false =
+	#shipboard block entities always tick at full rate. Before
+	#1.4.9 the raw plot distance was used, which throttled every
+	#shipboard block entity permanently. No effect without Sable.
+	sableTickReduction = true
+	#Aboard Sable ships, block entities within this TRUE visual
+	#distance always tick at full rate, whatever the global bands
+	#say - so the ship you are standing on stays perfectly smooth
+	#even on aggressive presets (Potato's global full-rate band is
+	#4 blocks). Beyond it, the normal mid/far bands apply on the
+	#true distance. No effect without Sable.
+	# Default: 32
+	# Range: 4 ~ 128
+	sableFullRateDistance = 32
+	#Render-culling radius (blocks of TRUE visual distance) for
+	#Create block entities aboard Sable ships. 64 = vanilla (no
+	#culling). Distant ships stop paying their dynamic renderers
+	#(multiblock thrusters, wheels, belt items...) while nearby
+	#ships stay fully detailed. No effect without Sable.
+	# Default: 48
+	# Range: 8 ~ 64
+	sableRenderDistance = 48
+	#Project sound positions out of Sable sub-levels before the
+	#distance culling tests (Sable's own attenuation primitive).
+	#Keeps shipboard machine sounds audible next to a ship and
+	#correctly culls them when the ship is genuinely far away.
+	#No effect without Sable.
+	sableSoundProjection = true
+
+#Sable Ragdolls (sable_player_ragdoll) client-side relief.
+#The mod renders every ragdoll limb as a block entity inside its
+#own Sable sub-level; its renderers do uncached reflection every
+#frame and can even build a full entity per frame per limb.
+#These options are inert without sable_player_ragdoll.
+[ragdoll]
+	#Render mob ragdoll parts from the geometry the mod already
+	#stores in each part (its own fallback renderer) instead of
+	#replaying the full entity renderer every frame with reflection
+	#on every model field and render layer - and, when the source
+	#mob is out of client range, creating a whole new entity from
+	#NBT EVERY FRAME for EVERY limb. Mob limbs keep their skin and
+	#shape; only extra layers (armor, saddles, held items) on the
+	#ragdoll are dropped. Player ragdolls are not affected.
+	fastMobRender = true
+	#Cache the resolved player skin of each player ragdoll limb for
+	#2 seconds instead of rebuilding a GameProfile (3x per frame per
+	#limb) and querying the skin manager on every frame. The skin
+	#still updates once its async download completes.
+	skinCache = true
+	#Player ragdoll limbs render the skin and vanilla armor only.
+	#The mod replays EVERY render layer of the player renderer on
+	#each of the 6 limbs every frame (held gun/item, Curios and
+	#Accessories renderers, backtank, cape, elytra, mod hats...),
+	#which on the reference client profile was ~3/4 of the limb
+	#cost, most of it from item renderers decoding NBT per frame.
+	#OFF = vanilla behaviour of the mod (all layers on the ragdoll).
+	lightPlayerLimbs = true
+
+#Create track curves.
+[tracks]
+	#Share Create's track curve runtime (handle length, curve length,
+	#segment table, bounds) between BezierConnection instances that
+	#describe the same curve. SimulatedCoasters re-creates every
+	#connection of its coaster graph on each sync (any track edit,
+	#any Sable sub-level removal - 6 per ragdoll exit) and rebuilds
+	#all of them on the render thread: 9.6% of the frame on the
+	#2026-08-30 client profile. Keyed on endpoints, axes, material
+	#and coaster handle lengths, so an unchanged edge reuses its
+	#runtime.
+	bezierRuntimeCache = true
+
+#Other client-side render relief.
+[render]
+	#Sophisticated Storage limited barrels: memoize the abbreviated
+	#count string (String.format + a fresh NumberFormat per label per
+	#frame) and share the label component so its bidi layout is not
+	#recomputed every frame. ~1.5% of the render thread on the
+	#2026-08-30 client profile. Inert without Sophisticated Storage.
+	barrelCountCache = true
+	#Memoize HierarchicalModel.getAnyDescendantWithName per model.
+	#Keyframe animations (vanilla warden/camel/sniffer..., Create
+	#Ornithopter Glider curio) resolve every animated part BY NAME on
+	#every frame by streaming the whole part tree - 1.6% of the
+	#render thread for the glider alone on the 2026-08-30 profile.
+	#A baked model's part tree never changes.
+	modelPartLookupCache = true

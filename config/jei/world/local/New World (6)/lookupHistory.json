@@ -1,0 +1,4 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"tacz:modern_kinetic_gun","components":"{\"minecraft:custom_data\":{GunCurrentAmmoCount:6,GunFireMode:\"SEMI\",GunId:\"tacz:rhino357\",HasBulletInBarrel:1b}}"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

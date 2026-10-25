@@ -1,0 +1,6 @@
+[
+  {"version":2},
+  {"ingredient":{"id":"create_dragons_plus:fluid_hatch"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"create:limestone"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"tfmg:heavy_plate"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

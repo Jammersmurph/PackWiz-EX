@@ -1,0 +1,97 @@
+[claims]
+	#Base claims per member
+	# Default: 8
+	# Range: 1 ~ 512
+	claimsPerMemberBase = 8
+	#Hard cap on total claims per nation
+	# Default: 64
+	# Range: 1 ~ 4096
+	claimsPerMemberMax = 64
+	#Claim cap for a player who hasn't joined or founded a nation
+	# Default: 1
+	# Range: 0 ~ 4096
+	soloClaimCap = 1
+	#Require voluntary claims to border your nation's existing territory in the same dimension (anti-grief)
+	requireContiguousClaims = false
+
+[war]
+	#Ticks between war declaration and war start (2400 = 2 min)
+	# Default: 2400
+	# Range: > 0
+	declarationCooldownTicks = 2400
+	#Ticks until a war times out (144000 = 2 hours)
+	# Default: 144000
+	# Range: > 1
+	endCooldownTicks = 144000
+	#Minimum members a nation must have to declare war
+	# Default: 1
+	# Range: 1 ~ 100
+	minMembersToDeclarWar = 1
+	#War model: CHUNK_CAPTURE, ATTRITION, SIEGE, OBJECTIVES, NEGOTIATED
+	warModel = "CHUNK_CAPTURE"
+	#Score threshold to win a war (CHUNK_CAPTURE, ATTRITION, OBJECTIVES)
+	# Default: 100
+	# Range: 1 ~ 10000
+	warScoreToWin = 100
+	#Ticks required to capture one chunk
+	# Default: 200
+	# Range: 1 ~ 72000
+	captureTicksBase = 200
+	#Ticks attacker must hold defender home to win a SIEGE war
+	# Default: 12000
+	# Range: > 1
+	siegeHoldTicks = 12000
+	#War-score points per enemy-owned chunk a side has presence in, per scoring interval (ATTRITION, NEGOTIATED)
+	# Default: 1
+	# Range: 0 ~ 10000
+	attritionPointsPerTick = 1
+	#Maximum simultaneous active wars per nation
+	# Default: 3
+	# Range: 1 ~ 100
+	maxConcurrentWarsPerNation = 3
+	#Minimum claimed chunks a nation must own to declare war
+	# Default: 0
+	# Range: 0 ~ 4096
+	minClaimsToDeclareWar = 0
+	#Require staff to approve war declarations (/wn admin war approve) before the countdown starts
+	requireWarApproval = true
+	#Require staff to approve nation creation (/wn admin nation approve <player>) before the nation is founded
+	requireNationApproval = true
+	#Require staff to approve a nation's custom-painted banner (/wn admin banner approve <nation>) before it replaces the current one
+	requireBannerApproval = true
+
+[outcome]
+	#Percent of loser claims annexed by winner on a decisive win
+	# Default: 50
+	# Range: 0 ~ 100
+	annexPercent = 50
+	#Ticks of re-declaration immunity granted to the loser after a war
+	# Default: 6000
+	# Range: > 0
+	postWarProtectionTicks = 6000
+
+[combat]
+	#Whether allied nation members can damage each other
+	allowFriendlyFire = false
+	#Shield claimed land from explosions, cross-border pistons, mob block-breaking and trampling
+	claimEnvironmentProtection = true
+	#CONQUEST base score; attacker win threshold = this * defender tier weight, points per capture = attacker tier weight
+	# Default: 20
+	# Range: 1 ~ 100000
+	conquestScoreBase = 20
+
+[territory]
+	#Strength decay rate per tick for unclaimed/inactive chunks
+	# Default: 0.01
+	# Range: 0.0 ~ 1.0
+	chunkStrengthDecayRate = 0.01
+	#Ticks a nation-home 'Go Home' teleport channels for before completing; cancelled by damage or movement (100 = 5s). 0 disables the channel (instant teleport).
+	# Default: 100
+	# Range: 0 ~ 72000
+	homeTeleportChannelTicks = 100
+
+[display]
+	#Show the player's rank, from an external rank-provider mod (LuckPerms), as its own bracketed segment next to the nation tag in chat/tab list. No effect if no supported rank-provider mod is installed.
+	showRankTag = true
+	#Render the nation tag after the player's name instead of before it
+	nationTagAsSuffix = false

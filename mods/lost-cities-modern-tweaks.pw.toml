@@ -1,0 +1,16 @@
+name = "Lost Cities Modern Tweaks"
+filename = "lostcities-modern-tweaks-v2.0.7.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "b53a3c88bb6de7472f6e1e1936fab06ae385d098"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 7625567
+project-id = 1462483
+
+[option]
+optional = true

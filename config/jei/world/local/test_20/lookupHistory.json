@@ -1,0 +1,6 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"minecraft:gunpowder"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"createbigcannons:packed_gunpowder"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"minecraft:end_rod"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]

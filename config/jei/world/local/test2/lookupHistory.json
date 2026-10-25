@@ -1,0 +1,7 @@
+[
+  {"version":1},
+  {"ingredient":{"id":"advancednetherite:netherite_iron_ingot"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"advancednetherite:netherite_diamond_ingot"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"advancednetherite:netherite_diamond_boots"},"type":"item_stack","bookmarkType":"INGREDIENT"},
+  {"ingredient":{"id":"advancednetherite:netherite_emerald_chestplate"},"type":"item_stack","bookmarkType":"INGREDIENT"}
+]
