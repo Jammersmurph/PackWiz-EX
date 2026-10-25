@@ -2,7 +2,7 @@ hash-format = "sha256"
 
 [[files]]
 file = ".gitingnore"
-hash = "eadb8f3e1d3482b2266bd359c02360037d8c7f66b8ccbaa79d1da252c70ee49e"
+hash = "68c820294a7675223c86154a1c7f76fd33acd712df60e15129bf89f2dc3a02da"
 
 [[files]]
 file = "config/CSC/CSC_Warn.log"
