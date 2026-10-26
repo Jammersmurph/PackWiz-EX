@@ -1,10 +1,6 @@
 hash-format = "sha256"
 
 [[files]]
-file = ".gitingnore"
-hash = "eadb8f3e1d3482b2266bd359c02360037d8c7f66b8ccbaa79d1da252c70ee49e"
-
-[[files]]
 file = "config/packupdater.properties"
 hash = "d05fbdf06fe78f8253de1c41f6dab9ad994bd593d2a6a4ecd7a28e0f489becf5"
 
