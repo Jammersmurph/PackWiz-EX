@@ -3,12 +3,3 @@ hash-format = "sha256"
 [[files]]
 file = ".gitingnore"
 hash = "68c820294a7675223c86154a1c7f76fd33acd712df60e15129bf89f2dc3a02da"
-
-[[files]]
-file = "config/packupdater.properties"
-hash = "d05fbdf06fe78f8253de1c41f6dab9ad994bd593d2a6a4ecd7a28e0f489becf5"
-
-[[files]]
-file = "mods/packupdater.pw.toml"
-hash = "d0e200cf01ae162cab4edeffcbf43bf357080d7a87910230081dcf87a92a7392"
-metafile = true
