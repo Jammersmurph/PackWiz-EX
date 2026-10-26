@@ -1,0 +1,13 @@
+name = "NeoStarHUD"
+filename = "starhud-neoforge-1.21.1-2.5.3.jar"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/cqintpL2/versions/ro3hrSmv/starhud-neoforge-1.21.1-2.5.3.jar"
+hash-format = "sha512"
+hash = "b75a09a2fbdb7d21c0868c6e515333ab4f46a097faee8aff3c859f3db45463a6ad34656fb2ef5ef2f1040beb6be10d7b8491c044a4f18ef2499324e0c19301ab"
+
+[update]
+[update.modrinth]
+mod-id = "cqintpL2"
+version = "ro3hrSmv"
