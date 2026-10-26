@@ -1,7 +1,0 @@
-[
-  {"version":2},
-  {"ingredient":{"id":"minecraft:cobweb"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"rocketnautics:titanium_ingot"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_the_air_wars:titaniumingot"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"minecraft:lodestone"},"type":"item_stack","bookmarkType":"INGREDIENT"}
-]

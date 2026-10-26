@@ -1,8 +1,0 @@
-[
-  {"version":1},
-  {"ingredient":{"id":"minecraft:enchanted_golden_apple"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"cbc_more_content:bounding_mine"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"cbc_more_content:tripwire_coil"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"cbc_more_content:sea_bomb"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"cbc_more_content:cruise_missile"},"type":"item_stack","bookmarkType":"INGREDIENT"}
-]

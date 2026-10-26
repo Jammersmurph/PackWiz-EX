@@ -1,9 +1,0 @@
-[
-  {"version":1},
-  {"ingredient":{"id":"create_submarine:floater"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_submarine:water_thruster"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_submarine:oxygene_diffuser"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_submarine:ballast_vent"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_submarine:ballast_tank"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_submarine:creative_oxygenator"},"type":"item_stack","bookmarkType":"INGREDIENT"}
-]

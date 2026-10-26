@@ -1,9 +1,0 @@
-[
-  {"version":1},
-  {"ingredient":{"id":"create:crafting_blueprint"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"tfmg:creative_generator"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_radar:creative_radar_plate"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"simulated:creative_physics_staff"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"sophisticatedbackpacks:survival_infinity_upgrade"},"type":"item_stack","bookmarkType":"INGREDIENT"},
-  {"ingredient":{"id":"create_connected:creative_fluid_vessel"},"type":"item_stack","bookmarkType":"INGREDIENT"}
-]
