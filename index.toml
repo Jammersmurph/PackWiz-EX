@@ -9,6 +9,11 @@ file = "config/packupdater.properties"
 hash = "d05fbdf06fe78f8253de1c41f6dab9ad994bd593d2a6a4ecd7a28e0f489becf5"
 
 [[files]]
+file = "mods/cloth-config.pw.toml"
+hash = "75181b55e0407d1fca1e2f346c6501f919f5109545990ddfb66db9cd1b771f8a"
+metafile = true
+
+[[files]]
 file = "mods/create-aeronautics.pw.toml"
 hash = "3b8895369640b2a52d3e05f7186185ba6798e44d513f11c5427a0fe9c16769e9"
 metafile = true
